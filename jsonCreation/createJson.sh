@@ -5,7 +5,7 @@
 START=1
 END=1000
 
-for (( i=$START; i<=$END; i++ ))
+for (( i=$START; i<$END; i++ ))
 do
     echo  "{" > $i.json
     echo  "  \"name\":\"$i\"," >> $i.json
