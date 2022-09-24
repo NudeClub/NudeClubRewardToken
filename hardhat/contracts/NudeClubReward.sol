@@ -67,7 +67,10 @@ contract NudeClubReward is ERC721Enumerable, Ownable {
         paused = _paused;
     }
 
-    function withdrawAll() public onlyOwner {
-        require(payable(msg.sender).send(address(this).balance));
-    }
+	function withdraw() public onlyOwner {
+		address _owner = owner();
+		uint256 amount = address(this).balance;
+		(bool sent, ) =  _owner.call{value: amount}("");
+		require(sent, "Failed to send Ether");
+	}
 }
