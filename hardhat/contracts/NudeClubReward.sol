@@ -27,7 +27,7 @@ contract NudeClubReward is ERC721Enumerable, Ownable {
     address public nudeClubRewardContract;
     string _baseTokenURI;
     mapping(address => bool) rewardRedeemable;
-    bool paused = true;
+    bool public paused = true;
 
     modifier IsPaused() {
         require(!paused, "contract paused");
@@ -63,7 +63,7 @@ contract NudeClubReward is ERC721Enumerable, Ownable {
         nudeClubRewardContract = newAddress;
     }
 
-    function setPause(bool _paused) public onlyOwner {
+    function setPaused(bool _paused) public onlyOwner {
         paused = _paused;
     }
 
