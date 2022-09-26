@@ -23,10 +23,13 @@ import "@openzeppelin/contracts/token/ERC721/extensions/ERC721Enumerable.sol";
 
 contract NudeClubReward is ERC721Enumerable, Ownable {
 
-    uint256 public amountMinted;
-    address public nudeClubRewardContract;
+    // Array of addresses we will use later on to distribute rewards
+    address[500] public rewardArray;
+    // Count of how many users have minted rewards
+    uint256 public numberOfUsersMinted;
+    // Token metadata link
     string _baseTokenURI;
-    mapping(address => bool) rewardRedeemable;
+    // Flag to stop/start reward minting
     bool public paused = true;
 
     modifier IsPaused() {
@@ -38,29 +41,16 @@ contract NudeClubReward is ERC721Enumerable, Ownable {
         _baseTokenURI = baseURI;
     }
 
+    // Function for users to mint a reward token
+    // 500 users can mint one token to each address for 0.002 eth
+    // Address is stored in a public array for us to read from later on
     function mint() public payable IsPaused {
-        require(amountMinted < 500, "None left");
-        require(msg.sender == tx.origin, "EOAs only");
+        require(numberOfUsersMinted <= 500, "None left");
         require(balanceOf(msg.sender) == 0, "One per address");
-        require(!rewardRedeemable[msg.sender], "Address already ready to redeem reward");
         require(msg.value == 0.002 ether, "Wrong value");
-        ++amountMinted;
-        rewardRedeemable[msg.sender] = true;
-        _safeMint(msg.sender, amountMinted);
-    }
-
-    // Reward function defined in the future will call this function to burn the NFT
-    // and remove the address from the award list. If the function returns true to our
-    // reward function we can proceed and reward the address
-    function redeemReward(address holder) public IsPaused returns (bool) {
-        require(msg.sender == nudeClubRewardContract, "To be called to redeem reward");
-        require(rewardRedeemable[holder]);
-        rewardRedeemable[holder] = false;
-        return true;
-    }
-
-    function setNudeClubRewardContract(address newAddress) public onlyOwner {
-        nudeClubRewardContract = newAddress;
+        ++numberOfUsersMinted;
+        rewardArray[numberOfUsersMinted] = msg.sender;
+        _safeMint(msg.sender, numberOfUsersMinted);
     }
 
     function setPaused(bool _paused) public onlyOwner {
