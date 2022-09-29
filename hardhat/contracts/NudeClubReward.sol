@@ -45,12 +45,14 @@ contract NudeClubReward is ERC721Enumerable, Ownable {
     // 500 users can mint one token to each address for 0.002 eth
     // Address is stored in a public array for us to read from later on
     function mint() public payable IsPaused {
-        require(numberOfUsersMinted <= 500, "None left");
+        uint _numberOfUsersMinted = numberOfUsersMinted;
+        require(_numberOfUsersMinted <= 500, "None left");
         require(balanceOf(msg.sender) == 0, "One per address");
         require(msg.value == 0.002 ether, "Wrong value");
         ++numberOfUsersMinted;
-        rewardArray[numberOfUsersMinted] = msg.sender;
-        _safeMint(msg.sender, 1);
+        ++_numberOfUsersMinted;
+        rewardArray[_numberOfUsersMinted] = msg.sender;
+        _safeMint(msg.sender, _numberOfUsersMinted);
     }
 
     function setPaused(bool _paused) public onlyOwner {
