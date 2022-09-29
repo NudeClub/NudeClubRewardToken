@@ -50,7 +50,7 @@ contract NudeClubReward is ERC721Enumerable, Ownable {
         require(msg.value == 0.002 ether, "Wrong value");
         ++numberOfUsersMinted;
         rewardArray[numberOfUsersMinted] = msg.sender;
-        _safeMint(msg.sender, numberOfUsersMinted);
+        _safeMint(msg.sender, 1);
     }
 
     function setPaused(bool _paused) public onlyOwner {
