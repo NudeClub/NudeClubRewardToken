@@ -4,7 +4,7 @@ require("hardhat-gas-reporter");
 
 const GOERLI_URL = process.env.GOERLI_URL;
 const PRIVATE_KEY = process.env.PRIVATE_KEY;
-const REPORT_GAS = process.env.REPORT_GAS;
+const API_KEY = process.env.API_KEY;
 
 module.exports = {
   solidity: "0.8.17",
@@ -15,7 +15,10 @@ module.exports = {
     },
   },
 
-  gasReporter: {
-    enabled: (process.env.REPORT_GAS) ? true : false
-  }
+  etherscan: {
+    apiKey: {
+      goerli: API_KEY
+    },
+  },
+
 };
