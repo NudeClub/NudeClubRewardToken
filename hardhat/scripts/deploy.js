@@ -5,7 +5,7 @@ async function main() {
 
   const NudeClubRewardContract = await ethers.getContractFactory("NudeClubReward");
 
-  const deployedContract = await NudeClubRewardContract.deploy("ipfs://QmSyrVNtDaXoEDEEBa6uuYVTFfPmWoLNGmgDhoU9KkPpha/");
+  const deployedContract = await NudeClubRewardContract.deploy("ipfs://QmTgGEQHyw5fJVDjYjszH6SGGcZjR4p4jkTjvrwquBfE96/", "0x26fA48f0407DBa513d7AD474e95760794e5D698E");
 
   await deployedContract.deployed();
 

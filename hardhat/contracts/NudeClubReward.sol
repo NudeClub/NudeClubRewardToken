@@ -3,6 +3,7 @@ pragma solidity ^0.8.16;
 
 import '@openzeppelin/contracts/access/Ownable.sol';
 import "@openzeppelin/contracts/token/ERC721/extensions/ERC721Enumerable.sol";
+import "@openzeppelin/contracts/utils/Strings.sol";
 
  
 /*  ⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⣀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
@@ -23,22 +24,29 @@ import "@openzeppelin/contracts/token/ERC721/extensions/ERC721Enumerable.sol";
 
 contract NudeClubReward is ERC721Enumerable, Ownable {
 
+	using Strings for uint256;
+
     // Array of addresses we will use later on to distribute rewards
     address[500] public rewardArray;
+    // Mapping to check if address is in array yet
+    mapping (address => bool) addressCheck;
     // Count of how many users have minted rewards
     uint256 public numberOfUsersMinted;
     // Token metadata link
-    string _baseTokenURI;
+    string baseTokenURI;
     // Flag to stop/start reward minting
     bool public paused = true;
+    // Multisig wallet to withdraw to 
+    address multsigWallet;
 
     modifier IsPaused() {
         require(!paused, "contract paused");
         _;
     }
 
-    constructor(string memory baseURI) ERC721("Nude Club Reward Token", "NUDE") {
-        _baseTokenURI = baseURI;
+    constructor(string memory _baseURI, address _multisigWallet) ERC721("Nude Club Reward Token", "NUDE") {
+        baseTokenURI = _baseURI;
+        multsigWallet = _multisigWallet;
     }
 
     // Function for users to mint a reward token
@@ -49,8 +57,10 @@ contract NudeClubReward is ERC721Enumerable, Ownable {
         require(_numberOfUsersMinted <= 500, "None left");
         require(balanceOf(msg.sender) == 0, "One per address");
         require(msg.value == 0.002 ether, "Wrong value");
+        require(!addressCheck[msg.sender]);
         ++numberOfUsersMinted;
         ++_numberOfUsersMinted;
+        addressCheck[msg.sender] = true;
         rewardArray[_numberOfUsersMinted] = msg.sender;
         _safeMint(msg.sender, _numberOfUsersMinted);
     }
@@ -59,10 +69,17 @@ contract NudeClubReward is ERC721Enumerable, Ownable {
         paused = _paused;
     }
 
+	function tokenURI(uint256 tokenId) public view virtual override returns (string memory) {
+		require(_exists(tokenId), "ERC721: invalid token ID");
+
+		string memory baseURI = baseTokenURI;
+		// Attach tokenID so it can find the token stored on IPFS
+		return bytes(baseURI).length > 0 ? string(abi.encodePacked(baseURI, tokenId.toString(), ".json")) : "";
+	}
+
 	function withdraw() public onlyOwner {
-		address _owner = owner();
 		uint256 amount = address(this).balance;
-		(bool sent, ) =  _owner.call{value: amount}("");
+		(bool sent, ) =  multsigWallet.call{value: amount}("");
 		require(sent, "Failed to send Ether");
 	}
 }

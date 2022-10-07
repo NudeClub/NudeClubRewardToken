@@ -3,7 +3,7 @@
 # Shell script to create nft metadata
 
 START=1
-END=1000
+END=10
 
 for (( i=$START; i<$END; i++ ))
 do
