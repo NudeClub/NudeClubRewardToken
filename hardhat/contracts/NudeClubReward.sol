@@ -2,7 +2,7 @@
 pragma solidity ^0.8.16;
 
 import '@openzeppelin/contracts/access/Ownable.sol';
-import "@openzeppelin/contracts/token/ERC721/extensions/ERC721Enumerable.sol";
+import "@openzeppelin/contracts/token/ERC1155/ERC1155.sol";
 import "@openzeppelin/contracts/utils/Strings.sol";
 
  
@@ -22,7 +22,7 @@ import "@openzeppelin/contracts/utils/Strings.sol";
     ⠀⠀⠀⠀⠀⠀⠀⠈⠛⢿⣿⣿⣿⣿⣿⡿⠟⢁⣴⣿⡿⠟⠉⠀⠀⠀⠀⠀⠀⠀
     ⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠈⠉⠉⠀⠀⠀⠉⠁⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀  */
 
-contract NudeClubReward is ERC721Enumerable, Ownable {
+contract NudeClubReward is ERC1155, Ownable {
 
 	using Strings for uint256;
 
@@ -37,18 +37,16 @@ contract NudeClubReward is ERC721Enumerable, Ownable {
     // Flag to stop/start reward minting
     bool public paused = true;
     // Multisig wallet to withdraw to 
-    address multsigWallet;
+    address immutable multsigWallet;
 
     modifier IsPaused() {
         require(!paused, "contract paused");
         _;
     }
 
-    /// @dev We define the NFT URI and multisig wallet address when creating the contract 
-    /// @param _baseURI IPFS metadata folder link
+    /// @dev We define the NFT URI and multisig wallet address when creating the contract   
     /// @param _multisigWallet Wallet address we want to withdraw any eth in this contract to
-    constructor(string memory _baseURI, address _multisigWallet) ERC721("Nude Club Reward Token", "NUDE") {
-        baseTokenURI = _baseURI;
+    constructor(address _multisigWallet) ERC1155("https://ipfs.io/ipfs/QmVM4XtXn9urEmZz7ToHp1gLZZAnM1sxFFL6KtdaAQDwfT/{id}.json") {
         multsigWallet = _multisigWallet;
     }
 
@@ -58,14 +56,14 @@ contract NudeClubReward is ERC721Enumerable, Ownable {
     function mint() public payable IsPaused {
         uint _numberOfUsersMinted = numberOfUsersMinted;
         require(_numberOfUsersMinted <= 500, "None left");
-        require(balanceOf(msg.sender) == 0, "One per address");
-        require(msg.value == 0.002 ether, "Wrong value");
+        require(balanceOf(msg.sender, 1) == 0, "One per address");
         require(!addressCheck[msg.sender]);
         ++numberOfUsersMinted;
         ++_numberOfUsersMinted;
         addressCheck[msg.sender] = true;
         rewardArray[_numberOfUsersMinted] = msg.sender;
-        _safeMint(msg.sender, _numberOfUsersMinted);
+        //_safeMint(msg.sender, _numberOfUsersMinted);
+        _mint(msg.sender, 1, 1, "");
     }
 
     /// @dev For turning the mint on/off
@@ -74,15 +72,6 @@ contract NudeClubReward is ERC721Enumerable, Ownable {
         paused = _paused;
     }
 
-    /// @dev overwriting erc721 tokenURI to use our own, this returns the correct IPFS data when minting 
-    /// @param _tokenId ID which we increcement with each mint 
-	function tokenURI(uint256 _tokenId) public view virtual override returns (string memory) {
-		require(_exists(_tokenId), "ERC721: invalid token ID");
-
-		string memory baseURI = baseTokenURI;
-		// Attach tokenID so it can find the token stored on IPFS
-		return bytes(baseURI).length > 0 ? string(abi.encodePacked(baseURI, _tokenId.toString(), ".json")) : "";
-	}
 
     /// @dev Withdraw to wallet address defined in the constructor
 	function withdraw() public onlyOwner {
