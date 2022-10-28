@@ -52,17 +52,14 @@ contract NudeClubReward is ERC1155, Ownable {
 
     /// @dev Mint same NFT to every user, add their address to the array 
     /// and mapping to verify, ensure we can't add any address twice or mint twice
-    /// Currently we can only mint to 500 users and it costs 0.002eth + txn fee to mint 
+    /// Currently we can only mint to 500 users and costs just the txn fee to mint 
     function mint() public payable IsPaused {
-        uint _numberOfUsersMinted = numberOfUsersMinted;
-        require(_numberOfUsersMinted <= 500, "None left");
+        require(numberOfUsersMinted <= 500, "None left");
         require(balanceOf(msg.sender, 1) == 0, "One per address");
         require(!addressCheck[msg.sender]);
         ++numberOfUsersMinted;
-        ++_numberOfUsersMinted;
         addressCheck[msg.sender] = true;
-        rewardArray[_numberOfUsersMinted] = msg.sender;
-        //_safeMint(msg.sender, _numberOfUsersMinted);
+        rewardArray[numberOfUsersMinted] = msg.sender;
         _mint(msg.sender, 1, 1, "");
     }
 

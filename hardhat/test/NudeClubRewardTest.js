@@ -13,7 +13,7 @@ describe("Nude Club Reward contract", function () {
     const NudeClubReward = await ethers.getContractFactory("NudeClubReward");
 
     // Deploy contract with dummy metadata (This will be the ipfs link for the collection)
-    const NudeClubRewardContract = await NudeClubReward.deploy("ipfs://QmSyrVNtDaXoEDEEBa6uuYVTFfPmWoLNGmgDhoU9KkPpha/", "0x26fA48f0407DBa513d7AD474e95760794e5D698E");
+    const NudeClubRewardContract = await NudeClubReward.deploy("0x26fA48f0407DBa513d7AD474e95760794e5D698E");
 
     // Only owner can unpause the contract
     await NudeClubRewardContract.setPaused(false);
@@ -36,7 +36,7 @@ describe("Nude Club Reward contract", function () {
     const NudeClubReward = await ethers.getContractFactory("NudeClubReward");
 
     // Deploy contract with dummy metadata (This will be the ipfs link for the collection)
-    const NudeClubRewardContract = await NudeClubReward.deploy("ipfs://QmSyrVNtDaXoEDEEBa6uuYVTFfPmWoLNGmgDhoU9KkPpha/", "0x26fA48f0407DBa513d7AD474e95760794e5D698E");
+    const NudeClubRewardContract = await NudeClubReward.deploy("0x26fA48f0407DBa513d7AD474e95760794e5D698E");
 
     // Only owner can unpause the contract
     await NudeClubRewardContract.setPaused(false);
@@ -57,38 +57,6 @@ describe("Nude Club Reward contract", function () {
 
   });
 
-  it("User can only mint for 0.002 eth", async function () {
-
-    const [addr1, addr2] = await ethers.getSigners();
-
-    const NudeClubReward = await ethers.getContractFactory("NudeClubReward");
-
-    // Deploy contract with dummy metadata (This will be the ipfs link for the collection)
-    const NudeClubRewardContract = await NudeClubReward.deploy("ipfs://QmSyrVNtDaXoEDEEBa6uuYVTFfPmWoLNGmgDhoU9KkPpha/", "0x26fA48f0407DBa513d7AD474e95760794e5D698E");
-
-    // Only owner can unpause the contract
-    await NudeClubRewardContract.setPaused(false);
-
-    // Confirm no passes minted yet
-    expect(await NudeClubRewardContract.numberOfUsersMinted()).to.equal(0);
-
-    // Mints reward token and adds address to array
-    await NudeClubRewardContract.connect(addr1).mint({ value: ethers.utils.parseEther("0.002") });
-
-    // Confirm one pass minted
-    expect(await NudeClubRewardContract.numberOfUsersMinted()).to.equal(1);
-
-    // Contract should revert transaction
-    await expect( 
-        NudeClubRewardContract.connect(addr2).mint({ value: ethers.utils.parseEther("1") })
-    ).to.be.revertedWith("Wrong value");
-
-    // Contract should revert transaction
-    await expect( 
-        NudeClubRewardContract.connect(addr2).mint({ value: ethers.utils.parseEther("0.001") })
-    ).to.be.revertedWith("Wrong value");
-
-  });
 
 
   it("500 passes minted to 500 addresses works correctly", async function () {
@@ -110,7 +78,7 @@ describe("Nude Club Reward contract", function () {
     const NudeClubReward = await ethers.getContractFactory("NudeClubReward");
 
     // Deploy contract with dummy metadata (This will be the ipfs link for the collection)
-    const NudeClubRewardContract = await NudeClubReward.deploy("ipfs://QmSyrVNtDaXoEDEEBa6uuYVTFfPmWoLNGmgDhoU9KkPpha/", "0x26fA48f0407DBa513d7AD474e95760794e5D698E");
+    const NudeClubRewardContract = await NudeClubReward.deploy("0x26fA48f0407DBa513d7AD474e95760794e5D698E");
 
     // Only owner can unpause the contract
     await NudeClubRewardContract.setPaused(false);
@@ -135,7 +103,7 @@ describe("Nude Club Reward contract", function () {
     const NudeClubReward = await ethers.getContractFactory("NudeClubReward");
 
     // Deploy contract with dummy metadata (This will be the ipfs link for the collection)
-    const NudeClubRewardContract = await NudeClubReward.deploy("ipfs://QmSyrVNtDaXoEDEEBa6uuYVTFfPmWoLNGmgDhoU9KkPpha/", "0x26fA48f0407DBa513d7AD474e95760794e5D698E");
+    const NudeClubRewardContract = await NudeClubReward.deploy("0x26fA48f0407DBa513d7AD474e95760794e5D698E");
 
     // Confirm no passes minted yet
     expect(await NudeClubRewardContract.numberOfUsersMinted()).to.equal(0);
@@ -165,7 +133,7 @@ describe("Nude Club Reward contract", function () {
 
     const NudeClubReward = await ethers.getContractFactory("NudeClubReward");
 
-    const NudeClubRewardContract = await NudeClubReward.deploy("ipfs://QmSyrVNtDaXoEDEEBa6uuYVTFfPmWoLNGmgDhoU9KkPpha/", "0x26fA48f0407DBa513d7AD474e95760794e5D698E");
+    const NudeClubRewardContract = await NudeClubReward.deploy("0x26fA48f0407DBa513d7AD474e95760794e5D698E");
 
     await expect (
         NudeClubRewardContract.connect(addr2).setPaused(false)
@@ -186,7 +154,7 @@ describe("Nude Club Reward contract", function () {
     const NudeClubReward = await ethers.getContractFactory("NudeClubReward");
 
     // Deploy contract with dummy metadata (This will be the ipfs link for the collection)
-    const NudeClubRewardContract = await NudeClubReward.deploy("ipfs://QmSyrVNtDaXoEDEEBa6uuYVTFfPmWoLNGmgDhoU9KkPpha/", "0x26fA48f0407DBa513d7AD474e95760794e5D698E");
+    const NudeClubRewardContract = await NudeClubReward.deploy("0x26fA48f0407DBa513d7AD474e95760794e5D698E");
 
     // Only owner can unpause the contract
     await NudeClubRewardContract.setPaused(false);
@@ -202,22 +170,5 @@ describe("Nude Club Reward contract", function () {
     expect(await NudeClubRewardContract.rewardArray(2)).to.equal(addr2.address);    
   });
 
-  it("Check for invalid token ID", async function() {
-
-    const [owner] = await ethers.getSigners();
-  
-    const NudeClubReward = await ethers.getContractFactory("NudeClubReward");
-  
-    // Deploy contract with dummy metadata (This will be the ipfs link for the collection)
-    const NudeClubRewardContract = await NudeClubReward.deploy("ipfs://QmSyrVNtDaXoEDEEBa6uuYVTFfPmWoLNGmgDhoU9KkPpha/", "0x26fA48f0407DBa513d7AD474e95760794e5D698E");
-  
-    // Only owner can start the mint 
-    await NudeClubRewardContract.connect(owner).setPaused(false);
-  
-    await expect(
-        NudeClubRewardContract.tokenURI(0)
-      ).to.be.revertedWith("ERC721: invalid token ID");
-  
-  })
 
 });
