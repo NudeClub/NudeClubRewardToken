@@ -27,7 +27,7 @@ contract NudeClubReward is ERC1155, Ownable {
 	using Strings for uint256;
 
     // Array of addresses we will use later on to distribute rewards
-    address[500] public rewardArray;
+    address[1000] public rewardArray;
     // Mapping to check if address is in array yet
     mapping (address => bool) addressCheck;
     // Count of how many users have minted rewards
@@ -46,15 +46,15 @@ contract NudeClubReward is ERC1155, Ownable {
 
     /// @dev We define the NFT URI and multisig wallet address when creating the contract   
     /// @param _multisigWallet Wallet address we want to withdraw any eth in this contract to
-    constructor(address _multisigWallet) ERC1155("https://ipfs.io/ipfs/QmVM4XtXn9urEmZz7ToHp1gLZZAnM1sxFFL6KtdaAQDwfT/{id}.json") {
+    constructor(address _multisigWallet) ERC1155("https://ipfs.io/ipfs/QmdWg4S1eoMMratLfa8CeedR3QMqA5ahXZuwDgS8b9UdHp/{id}.json") {
         multsigWallet = _multisigWallet;
     }
 
     /// @dev Mint same NFT to every user, add their address to the array 
     /// and mapping to verify, ensure we can't add any address twice or mint twice
-    /// Currently we can only mint to 500 users and costs just the txn fee to mint 
+    /// Currently we can only mint to 1000 users and costs just the txn fee to mint 
     function mint() public payable IsPaused {
-        require(numberOfUsersMinted <= 500, "None left");
+        require(numberOfUsersMinted < 1000, "All passes minted");
         require(balanceOf(msg.sender, 1) == 0, "One per address");
         require(!addressCheck[msg.sender]);
         ++numberOfUsersMinted;
