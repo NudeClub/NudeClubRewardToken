@@ -24,16 +24,8 @@ import "@openzeppelin/contracts/utils/Strings.sol";
 
 contract NudeClubReward is ERC1155, Ownable {
 
-	using Strings for uint256;
-
-    // Array of addresses we will use later on to distribute rewards
-    address[1000] public rewardArray;
-    // Mapping to check if address is in array yet
-    mapping (address => bool) addressCheck;
     // Count of how many users have minted rewards
-    uint256 public numberOfUsersMinted;
-    // Token metadata link
-    string baseTokenURI;
+    uint256 public numberOfTokensMinted;
     // Flag to stop/start reward minting
     bool public paused = true;
     // Multisig wallet to withdraw to 
@@ -44,23 +36,21 @@ contract NudeClubReward is ERC1155, Ownable {
         _;
     }
 
-    /// @dev We define the NFT URI and multisig wallet address when creating the contract   
+    /// @dev We define the multisig wallet address when creating the contract   
     /// @param _multisigWallet Wallet address we want to withdraw any eth in this contract to
     constructor(address _multisigWallet) ERC1155("https://ipfs.io/ipfs/QmdWg4S1eoMMratLfa8CeedR3QMqA5ahXZuwDgS8b9UdHp/{id}.json") {
         multsigWallet = _multisigWallet;
     }
 
     /// @dev Mint same NFT to every user, add their address to the array 
-    /// and mapping to verify, ensure we can't add any address twice or mint twice
-    /// Currently we can only mint to 1000 users and costs just the txn fee to mint 
-    function mint() public payable IsPaused {
-        require(numberOfUsersMinted < 1000, "All passes minted");
-        require(balanceOf(msg.sender, 1) == 0, "One per address");
-        require(!addressCheck[msg.sender]);
-        ++numberOfUsersMinted;
-        addressCheck[msg.sender] = true;
-        rewardArray[numberOfUsersMinted] = msg.sender;
-        _mint(msg.sender, 1, 1, "");
+    /// and mapping to verify, ensure users can't mint more than 5 tokens
+    /// Only 10,000 tokens in total can be minted
+    function mint(uint256 _amount) public payable IsPaused {
+        require(msg.value == 0.01 ether * _amount, "Incorrect amount of eth sent");
+        require(numberOfTokensMinted + _amount < 10000, "Cannot mint more than 10k tokens");
+        require(balanceOf(msg.sender, 1) + _amount <= 5 , "Only 5 per address");
+        numberOfTokensMinted += _amount;
+        _mint(msg.sender, 1, _amount, "");
     }
 
     /// @dev For turning the mint on/off
