@@ -19,17 +19,17 @@ describe("Nude Club Reward contract", function () {
     await NudeClubRewardContract.setPaused(false);
 
     // Confirm no passes minted yet
-    expect(await NudeClubRewardContract.numberOfUsersMinted()).to.equal(0);
+    expect(await NudeClubRewardContract.numberOfTokensMinted()).to.equal(0);
 
     // Mints reward token and adds address to array
-    await NudeClubRewardContract.connect(addr1).mint({ value: ethers.utils.parseEther("0.002") });
+    await NudeClubRewardContract.connect(addr1).mint(1, { value: ethers.utils.parseEther("0.01") });
 
     // Confirm one pass minted
-    expect(await NudeClubRewardContract.numberOfUsersMinted()).to.equal(1);
+    expect(await NudeClubRewardContract.numberOfTokensMinted()).to.equal(1);
 
   });
 
-  it("User can only mint one NFT", async function () {
+  it("User can only mint 5 tokens", async function () {
 
     const [addr1] = await ethers.getSigners();
 
@@ -42,18 +42,18 @@ describe("Nude Club Reward contract", function () {
     await NudeClubRewardContract.setPaused(false);
 
     // Confirm no passes minted yet
-    expect(await NudeClubRewardContract.numberOfUsersMinted()).to.equal(0);
+    expect(await NudeClubRewardContract.numberOfTokensMinted()).to.equal(0);
 
     // Mints reward token and adds address to array
-    await NudeClubRewardContract.connect(addr1).mint({ value: ethers.utils.parseEther("0.002") });
+    await NudeClubRewardContract.connect(addr1).mint(5, { value: ethers.utils.parseEther("0.05") });
 
     // Confirm one pass minted
-    expect(await NudeClubRewardContract.numberOfUsersMinted()).to.equal(1);
+    expect(await NudeClubRewardContract.numberOfTokensMinted()).to.equal(5);
 
     // Contract should revert transaction
     await expect( 
-        NudeClubRewardContract.connect(addr1).mint({ value: ethers.utils.parseEther("0.002") })
-    ).to.be.revertedWith("One per address");
+        NudeClubRewardContract.connect(addr1).mint(1, { value: ethers.utils.parseEther("0.01") })
+    ).to.be.revertedWith("Only 5 per address");
 
   });
 
@@ -84,7 +84,7 @@ describe("Nude Club Reward contract", function () {
     await NudeClubRewardContract.setPaused(false);
 
     // Confirm no passes minted yet
-    expect(await NudeClubRewardContract.numberOfUsersMinted()).to.equal(0);
+    expect(await NudeClubRewardContract.numberOfTokensMinted()).to.equal(0);
 
     // Mint a reward token to each address 
     //for(let i=0; i < 500; i++) {
@@ -92,7 +92,7 @@ describe("Nude Club Reward contract", function () {
     //}
 
     // Confirm 500 passes minted
-    expect(await NudeClubRewardContract.numberOfUsersMinted()).to.equal(1);
+    expect(await NudeClubRewardContract.numberOfTokensMinted()).to.equal(1);
     */
   });
 
@@ -106,24 +106,24 @@ describe("Nude Club Reward contract", function () {
     const NudeClubRewardContract = await NudeClubReward.deploy("0x26fA48f0407DBa513d7AD474e95760794e5D698E");
 
     // Confirm no passes minted yet
-    expect(await NudeClubRewardContract.numberOfUsersMinted()).to.equal(0);
+    expect(await NudeClubRewardContract.numberOfTokensMinted()).to.equal(0);
 
     // Mints reward token and adds address to array
     await expect ( 
-        NudeClubRewardContract.connect(addr1).mint({ value: ethers.utils.parseEther("0.002") })
+        NudeClubRewardContract.connect(addr1).mint(1, { value: ethers.utils.parseEther("0.01") })
     ).to.be.revertedWith("contract paused");
 
     // Only owner can unpause the contract
     await NudeClubRewardContract.setPaused(false);
 
     // Confirm no passes minted yet
-    expect(await NudeClubRewardContract.numberOfUsersMinted()).to.equal(0);
+    expect(await NudeClubRewardContract.numberOfTokensMinted()).to.equal(0);
 
     // Mints reward token and adds address to array
-    await NudeClubRewardContract.connect(addr1).mint({ value: ethers.utils.parseEther("0.002") });
+    await NudeClubRewardContract.connect(addr1).mint(1, { value: ethers.utils.parseEther("0.01") });
 
     // Confirm one pass minted
-    expect(await NudeClubRewardContract.numberOfUsersMinted()).to.equal(1);
+    expect(await NudeClubRewardContract.numberOfTokensMinted()).to.equal(1);
 
   });
 
@@ -147,7 +147,7 @@ describe("Nude Club Reward contract", function () {
   
   });
 
-  it("User can mint and address is added to rewardArray", async function () {
+  it("User cannot mint NFT for more or less than 0.01 eth per nft", async function () {
 
     const [addr1, addr2] = await ethers.getSigners();
 
@@ -159,16 +159,32 @@ describe("Nude Club Reward contract", function () {
     // Only owner can unpause the contract
     await NudeClubRewardContract.setPaused(false);
 
-    // Mints reward token and adds address to array
-    await NudeClubRewardContract.connect(addr1).mint({ value: ethers.utils.parseEther("0.002") });
-
-    expect(await NudeClubRewardContract.rewardArray(1)).to.equal(addr1.address);
-
-    // Mints reward token and adds address to array
-    await NudeClubRewardContract.connect(addr2).mint({ value: ethers.utils.parseEther("0.002") });
-
-    expect(await NudeClubRewardContract.rewardArray(2)).to.equal(addr2.address);    
+    // Contract should revert transaction
+    await expect( 
+      NudeClubRewardContract.connect(addr1).mint(1, { value: ethers.utils.parseEther("0.001") })
+  ).to.be.revertedWith("Incorrect amount of eth sent");
   });
 
+
+  it("Only owner can withdraw", async function () {
+
+    const [addr1, addr2] = await ethers.getSigners();
+
+    const NudeClubReward = await ethers.getContractFactory("NudeClubReward");
+
+    // Deploy contract with dummy metadata (This will be the ipfs link for the collection)
+    const NudeClubRewardContract = await NudeClubReward.deploy(addr1.getAddress());
+
+    // Only owner can unpause the contract
+    await NudeClubRewardContract.setPaused(false);
+
+    // Contract should let owner withdraw 
+    await NudeClubRewardContract.connect(addr1).withdraw();
+
+    // Contract should revert transaction
+    await expect( 
+        NudeClubRewardContract.connect(addr2).withdraw()
+    ).to.be.revertedWith("Ownable: caller is not the owner");
+  });
 
 });
