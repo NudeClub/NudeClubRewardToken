@@ -1,11 +1,27 @@
 const { ethers } = require("hardhat");
+const { MerkleTree } = require("merkletreejs");
+const { keccak256 } = ethers.utils;
+const {readFileSync} = require('fs');
 
 
 async function main() {
 
+  const whitelistFile = readFileSync('./whitelist.txt', 'utf-8');
+  const whitelistArray = whitelistFile.split(/\r?\n/);
+  console.log(whitelistArray); 
+
+  const padBuffer = (addr) => {
+    return Buffer.from(addr.substr(2).padStart(32 * 2, 0), "hex");
+  };
+  
+  const leaves = whitelistArray.map((address) => padBuffer(address));
+  const tree = new MerkleTree(leaves, keccak256, { sort: true });
+  
+  const merkleRoot = tree.getHexRoot();
+
   const NudeClubRewardContract = await ethers.getContractFactory("NudeClubReward");
 
-  const deployedContract = await NudeClubRewardContract.deploy("0xb6D9eb81FD551Fa1709065831Ed1eB8624644B6c");
+  const deployedContract = await NudeClubRewardContract.deploy("0xb6D9eb81FD551Fa1709065831Ed1eB8624644B6c", merkleRoot);
 
   await deployedContract.deployed();
 
