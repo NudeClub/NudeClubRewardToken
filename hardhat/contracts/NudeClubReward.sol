@@ -43,7 +43,7 @@ contract NudeClubReward is ERC1155, Ownable {
 
     /// @dev We define the multisig wallet address when creating the contract   
     /// @param _multisigWallet Wallet address we want to withdraw any eth in this contract to
-    constructor(address _multisigWallet, bytes32 _merkleRoot) ERC1155("https://ipfs.io/ipfs/QmdWg4S1eoMMratLfa8CeedR3QMqA5ahXZuwDgS8b9UdHp/{id}.json") {
+    constructor(address _multisigWallet, bytes32 _merkleRoot) ERC1155("https://ipfs.io/ipfs/QmVCPmxzCR4rB636Ghh5PqXfy56XNJ6NGY5oHr6Hjeso8X/{id}.json") {
         multsigWallet = _multisigWallet;
         merkleRoot = _merkleRoot;
     }

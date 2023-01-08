@@ -21,7 +21,7 @@ async function main() {
 
   const NudeClubRewardContract = await ethers.getContractFactory("NudeClubReward");
 
-  const deployedContract = await NudeClubRewardContract.deploy("0xb6D9eb81FD551Fa1709065831Ed1eB8624644B6c", merkleRoot);
+  const deployedContract = await NudeClubRewardContract.deploy("QmVjZ3ua2FVigmAVFNS9Cig9bRWjCsmm4S1ritVHq6DcVc", merkleRoot);
 
   await deployedContract.deployed();
 
